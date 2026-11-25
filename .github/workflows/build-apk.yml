@@ -46,6 +46,18 @@ jobs:
           echo "ANDROID_DIR=$D" >> "$GITHUB_ENV"
           echo "Found: $D"
 
+      - name: Fix build.gradle.kts (Properties import)
+        working-directory: ${{ env.ANDROID_DIR }}
+        run: |
+          F=app/build.gradle.kts
+          if grep -q 'java\.util\.Properties()' "$F"; then
+            sed -i 's/java\.util\.Properties()/Properties()/' "$F"
+            sed -i '1i import java.util.Properties' "$F"
+            echo "Patched $F"
+          else
+            echo "No patch needed"
+          fi
+
       - name: Add Firebase config (optional)
         working-directory: ${{ env.ANDROID_DIR }}
         env:
